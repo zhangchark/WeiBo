@@ -242,7 +242,6 @@ public class MainActivity extends FragmentActivity {
                     .setIcon(R.drawable.logo)
                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-
                             ((MyApplication) getApplication()).finishAll();
                         }
                     })
@@ -263,6 +262,11 @@ public class MainActivity extends FragmentActivity {
         super.onDestroy();
     }
 
+    /**
+     * 解决输入法中的内存泄漏问题
+     *
+     * @param destContext
+     */
     public void fixInputMethodManagerLeak(Context destContext) {
         if (destContext == null) {
             return;

@@ -23,14 +23,14 @@ import java.util.ArrayList;
  * 用于显示评论列表的adapter
  * Created by wenmingvs on 16/4/23.
  */
-public class RetweetAdapter extends RecyclerView.Adapter<ViewHolder> {
+public class MentionDetailAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private Context mContext;
     private ArrayList<Status> mDatas;
     private View mView;
 
 
-    public RetweetAdapter(Context mContext, ArrayList<Status> datas) {
+    public MentionDetailAdapter(Context mContext, ArrayList<Status> datas) {
         this.mContext = mContext;
         this.mDatas = datas;
     }
@@ -45,15 +45,12 @@ public class RetweetAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (holder instanceof RetweetViewHolder) {
-            User user = mDatas.get(position).user;
-            String content = mDatas.get(position).text;
-
-            FillContent.fillProfileImg(mContext, user, ((RetweetViewHolder) holder).profile_img, ((RetweetViewHolder) holder).profile_verified);
-            ((RetweetViewHolder) holder).profile_name.setText(user.name);
-            FillContent.setWeiBoTime(mContext, ((RetweetViewHolder) holder).profile_time, mDatas.get(position));
-            FillContent.fillWeiBoContent(content, mContext, ((RetweetViewHolder) holder).content);
-        }
+        User user = mDatas.get(position).user;
+        String content = mDatas.get(position).text;
+        FillContent.fillProfileImg(mContext, user, ((RetweetViewHolder) holder).profile_img, ((RetweetViewHolder) holder).profile_verified);
+        FillContent.fillWeiBoContent(content, mContext, ((RetweetViewHolder) holder).content);
+        FillContent.setWeiBoName(((RetweetViewHolder) holder).profile_name, user);
+        FillContent.setWeiBoTime(mContext, ((RetweetViewHolder) holder).profile_time, mDatas.get(position));
     }
 
 

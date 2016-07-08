@@ -11,10 +11,12 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wenming.weiswift.R;
+import com.wenming.weiswift.ui.login.fragment.home.userdetail.UserActivity;
 import com.wenming.weiswift.utils.DensityUtil;
 
 import java.util.regex.Matcher;
@@ -39,7 +41,12 @@ public class WeiBoContentTextUtil {
         Matcher matcher = pattern.matcher(spannableStringBuilder);
 
         if (matcher.find()) {
-            textView.setMovementMethod(ClickableMovementMethod.getInstance());
+            if (!(textView instanceof EditText)) {
+                textView.setMovementMethod(ClickableMovementMethod.getInstance());
+                textView.setFocusable(false);
+                textView.setClickable(false);
+                textView.setLongClickable(false);
+            }
             matcher.reset();
         }
 
@@ -56,10 +63,14 @@ public class WeiBoContentTextUtil {
                 WeiBoContentClickableSpan myClickableSpan = new WeiBoContentClickableSpan(context) {
                     @Override
                     public void onClick(View widget) {
-                        Toast.makeText(context, "点击了用户：" + at, Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(context, UserActivity.class);
+                        String screen_name = at.substring(1);
+                        intent.putExtra("screenName", screen_name);
+                        context.startActivity(intent);
+                        //Toast.makeText(context, "点击了用户：" + at, Toast.LENGTH_SHORT).show();
                     }
                 };
-                spannableStringBuilder.setSpan(myClickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannableStringBuilder.setSpan(myClickableSpan, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             }
             //处理##话题
             if (topic != null) {
@@ -71,7 +82,7 @@ public class WeiBoContentTextUtil {
                         Toast.makeText(context, "点击了话题：" + topic, Toast.LENGTH_LONG).show();
                     }
                 };
-                spannableStringBuilder.setSpan(clickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannableStringBuilder.setSpan(clickableSpan, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             }
 
             // 处理url地址
@@ -107,7 +118,7 @@ public class WeiBoContentTextUtil {
 //                    }
 //                };
 
-                spannableStringBuilder.setSpan(imageSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannableStringBuilder.setSpan(imageSpan, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             }
             //emoji
             if (emoji != null) {
@@ -130,7 +141,7 @@ public class WeiBoContentTextUtil {
                                 canvas.restore();
                             }
                         };
-                        spannableStringBuilder.setSpan(imageSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannableStringBuilder.setSpan(imageSpan, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                     }
                 }
             }

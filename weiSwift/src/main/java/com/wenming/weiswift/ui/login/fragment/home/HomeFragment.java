@@ -27,7 +27,6 @@ import com.wenming.weiswift.ui.login.fragment.home.groupwindow.IGroupItemClick;
 import com.wenming.weiswift.ui.login.fragment.home.weiboitem.HomeHeadView;
 import com.wenming.weiswift.ui.login.fragment.home.weiboitem.TimelineArrowWindow;
 import com.wenming.weiswift.ui.login.fragment.home.weiboitem.WeiboAdapter;
-import com.wenming.weiswift.ui.login.fragment.home.weiboitem.WeiboItemSapce;
 import com.wenming.weiswift.utils.DensityUtil;
 import com.wenming.weiswift.utils.ScreenUtil;
 import com.wenming.weiswift.widget.endlessrecyclerview.EndlessRecyclerOnScrollListener;
@@ -97,7 +96,6 @@ public class HomeFragment extends Fragment implements HomeFragmentView {
         return mView;
     }
 
-
     public void initRecyclerView() {
         mDatas = new ArrayList<Status>();
         mAdapter = new WeiboAdapter(mDatas, mContext) {
@@ -112,7 +110,7 @@ public class HomeFragment extends Fragment implements HomeFragmentView {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mHeaderAndFooterRecyclerViewAdapter);
         RecyclerViewUtils.setHeaderView(mRecyclerView, new HomeHeadView(mContext));
-        mRecyclerView.addItemDecoration(new WeiboItemSapce((int) mContext.getResources().getDimension(R.dimen.home_weiboitem_space)));
+        //mRecyclerView.addItemDecoration(new WeiboItemSapce((int) mContext.getResources().getDimension(R.dimen.home_weiboitem_space)));
     }
 
 

@@ -23,14 +23,14 @@ import java.util.ArrayList;
  * 用于显示评论列表的adapter
  * Created by wenmingvs on 16/4/23.
  */
-public class CommentAdapter extends RecyclerView.Adapter<ViewHolder> {
+public class CommentDetailAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private Context mContext;
     private ArrayList<Comment> mDatas;
     private View mView;
 
 
-    public CommentAdapter(Context mContext, ArrayList<Comment> datas) {
+    public CommentDetailAdapter(Context mContext, ArrayList<Comment> datas) {
         this.mContext = mContext;
         this.mDatas = datas;
     }
@@ -45,14 +45,12 @@ public class CommentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (holder instanceof CommentViewHolder) {
-            User user = mDatas.get(position).user;
-            String content = mDatas.get(position).text;
-            FillContent.fillProfileImg(mContext, user, ((CommentViewHolder) holder).profile_img, ((CommentViewHolder) holder).profile_verified);
-            ((CommentViewHolder) holder).profile_name.setText(user.name);
-            FillContent.setWeiBoTime(mContext, ((CommentViewHolder) holder).profile_time, mDatas.get(position));
-            FillContent.fillWeiBoContent(content, mContext, ((CommentViewHolder) holder).content);
-        }
+        User user = mDatas.get(position).user;
+        String content = mDatas.get(position).text;
+        FillContent.fillProfileImg(mContext, user, ((CommentViewHolder) holder).profile_img, ((CommentViewHolder) holder).profile_verified);
+        FillContent.fillWeiBoContent(content, mContext, ((CommentViewHolder) holder).content);
+        FillContent.setWeiBoName(((CommentViewHolder) holder).profile_name, user);
+        FillContent.setWeiBoTime(mContext, ((CommentViewHolder) holder).profile_time, mDatas.get(position));
     }
 
 

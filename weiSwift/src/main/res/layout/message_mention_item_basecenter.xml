@@ -6,8 +6,10 @@
     android:layout_marginBottom="8dp"
     android:layout_marginLeft="@dimen/home_weiboitem_marginleftright"
     android:layout_marginRight="@dimen/home_weiboitem_marginleftright"
-    android:background="@drawable/timeline_feedcard_retweet_background_auto"
+    android:background="#f7f7f7"
     android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:visibility="gone">
 
     <ImageView
         android:id="@+id/mentionitem_img"
@@ -18,7 +20,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#f7f7f7"
+        android:background="@drawable/home_commentcenter_grey_bg_auto"
         android:gravity="center"
         android:orientation="vertical">
 

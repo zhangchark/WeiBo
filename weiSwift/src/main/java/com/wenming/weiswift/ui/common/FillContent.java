@@ -1,5 +1,6 @@
 package com.wenming.weiswift.ui.common;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,13 +27,15 @@ import com.wenming.weiswift.R;
 import com.wenming.weiswift.entity.Comment;
 import com.wenming.weiswift.entity.Status;
 import com.wenming.weiswift.entity.User;
+import com.wenming.weiswift.mvp.model.imp.StatusDetailModelImp;
 import com.wenming.weiswift.ui.common.login.Constants;
 import com.wenming.weiswift.ui.login.fragment.home.imagedetaillist.ImageDetailsActivity;
 import com.wenming.weiswift.ui.login.fragment.home.imagelist.ImageAdapter;
 import com.wenming.weiswift.ui.login.fragment.home.userdetail.UserActivity;
-import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.activity.OriginPicTextCommentActivity;
-import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.activity.RetweetPicTextCommentActivity;
-import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.adapter.CommentAdapter;
+import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.activity.OriginPicTextCommentDetailActivity;
+import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.activity.RetweetPicTextCommentDetailActivity;
+import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.adapter.CommentDetailAdapter;
+import com.wenming.weiswift.ui.login.fragment.post.PostService;
 import com.wenming.weiswift.ui.login.fragment.post.idea.IdeaActivity;
 import com.wenming.weiswift.utils.DateUtils;
 import com.wenming.weiswift.utils.NetUtil;
@@ -104,7 +107,7 @@ public class FillContent {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, UserActivity.class);
-                intent.putExtra("user", user);
+                intent.putExtra("screenName", user.screen_name);
                 context.startActivity(intent);
             }
         });
@@ -241,6 +244,10 @@ public class FillContent {
             feedlike.setText("赞");
         }
 
+        fillButtonBar(context, status, bottombar_retweet, bottombar_comment, bottombar_attitude);
+    }
+
+    public static void fillButtonBar(final Context context, final Status status, LinearLayout bottombar_retweet, LinearLayout bottombar_comment, LinearLayout bottombar_attitude) {
         //如果转发的内容已经被删除,则不允许转发
         if (status.retweeted_status != null && status.retweeted_status.user == null) {
             bottombar_retweet.setEnabled(false);
@@ -248,20 +255,47 @@ public class FillContent {
             bottombar_retweet.setEnabled(true);
         }
 
-
         bottombar_comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (status.retweeted_status == null) {
-                    Intent intent = new Intent(context, OriginPicTextCommentActivity.class);
+                    Intent intent = new Intent(context, OriginPicTextCommentDetailActivity.class);
                     intent.putExtra("weiboitem", status);
-                    context.startActivity(intent);
+                    ((Activity) context).startActivityForResult(intent, 101);
                 } else {
-                    Intent intent = new Intent(context, RetweetPicTextCommentActivity.class);
+                    Intent intent = new Intent(context, RetweetPicTextCommentDetailActivity.class);
                     intent.putExtra("weiboitem", status);
-                    context.startActivity(intent);
+                    ((Activity) context).startActivityForResult(intent, 101);
                 }
 
+            }
+        });
+        bottombar_retweet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, IdeaActivity.class);
+                intent.putExtra("ideaType", PostService.POST_SERVICE_REPOST_STATUS);
+                intent.putExtra("status", status);
+                context.startActivity(intent);
+            }
+        });
+    }
+
+    public static void fillDetailButtonBar(final Context context, final Status status, LinearLayout bottombar_retweet, LinearLayout bottombar_comment, LinearLayout bottombar_attitude) {
+        //如果转发的内容已经被删除,则不允许转发
+        if (status.retweeted_status != null && status.retweeted_status.user == null) {
+            bottombar_retweet.setEnabled(false);
+        } else {
+            bottombar_retweet.setEnabled(true);
+        }
+
+        bottombar_comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, IdeaActivity.class);
+                intent.putExtra("ideaType", PostService.POST_SERVICE_COMMENT_STATUS);
+                intent.putExtra("status", status);
+                context.startActivity(intent);
             }
         });
 
@@ -269,12 +303,18 @@ public class FillContent {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, IdeaActivity.class);
+                intent.putExtra("ideaType", PostService.POST_SERVICE_REPOST_STATUS);
                 intent.putExtra("status", status);
                 context.startActivity(intent);
             }
         });
 
-
+        bottombar_attitude.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //点赞动画
+            }
+        });
     }
 
 
@@ -299,6 +339,14 @@ public class FillContent {
      * 填充微博文字内容
      */
     public static void fillWeiBoContent(String text, Context context, EmojiTextView weibo_content) {
+        weibo_content.setText(WeiBoContentTextUtil.getWeiBoContent(text, context, weibo_content));
+        //weibo_content.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    /**
+     * 填充微博文字内容
+     */
+    public static void fillWeiBoContent(String text, Context context, TextView weibo_content) {
         weibo_content.setText(WeiBoContentTextUtil.getWeiBoContent(text, context, weibo_content));
         //weibo_content.setMovementMethod(LinkMovementMethod.getInstance());
     }
@@ -495,27 +543,39 @@ public class FillContent {
     }
 
 
-    public static void FillDetailBar(int comments_count, int reposts_count, int attitudes_count, TextView comment, TextView redirect, TextView feedlike) {
+    public static void fillDetailBar(int comments_count, int reposts_count, int attitudes_count, TextView comment, TextView redirect, TextView feedlike) {
         comment.setText("评论 " + comments_count);
         redirect.setText("转发 " + reposts_count);
         feedlike.setText("赞 " + attitudes_count);
+
     }
 
-    public static void RefreshNoneView(Context context, int comments_count, View noneView) {
-
-
+    public static void refreshNoneView(Context context, int type, int repostss_count, int comments_count, View noneView) {
+        TextView textView = (TextView) noneView.findViewById(R.id.tv_normal_refresh_footer_status);
         if (NetUtil.isConnected(context)) {
-            if (comments_count > 0) {
-                noneView.setVisibility(View.GONE);
-            } else if (comments_count == 0) {
-                noneView.setVisibility(View.VISIBLE);
+            switch (type) {
+                case StatusDetailModelImp.COMMENT_PAGE:
+                    if (comments_count > 0) {
+                        noneView.setVisibility(View.GONE);
+                    } else if (comments_count == 0) {
+                        noneView.setVisibility(View.VISIBLE);
+                        textView.setText("还没有人评论");
+                    }
+                    break;
+
+                case StatusDetailModelImp.REPOST_PAGE:
+                    if (repostss_count > 0) {
+                        noneView.setVisibility(View.GONE);
+                    } else if (repostss_count == 0) {
+                        noneView.setVisibility(View.VISIBLE);
+                        textView.setText("还没有人转发");
+                    }
+                    break;
             }
+
         } else {
-            if (!NewFeature.CACHE_DETAIL_ACTIVITY) {
-                noneView.setVisibility(View.VISIBLE);
-                TextView textView = (TextView) noneView.findViewById(R.id.tv_normal_refresh_footer_status);
-                textView.setText("网络出错啦");
-            }
+            noneView.setVisibility(View.VISIBLE);
+            textView.setText("网络出错啦");
         }
 
     }
@@ -532,7 +592,7 @@ public class FillContent {
      */
 
     public static void fillCommentList(Context context, int commentCount, ArrayList<Comment> commentArrayList, final RecyclerView recyclerView, TextView commentView) {
-        CommentAdapter commentAdapter = new CommentAdapter(context, commentArrayList);
+        CommentDetailAdapter commentAdapter = new CommentDetailAdapter(context, commentArrayList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(commentAdapter);
@@ -586,14 +646,14 @@ public class FillContent {
         //填充我回复的评论
         if (comment.reply_comment != null) {
             mycomment.setVisibility(View.VISIBLE);
-            bg_layout.setBackgroundColor(Color.parseColor("#f7f7f7"));
-            comment_weibolayout.setBackgroundColor(Color.parseColor("#fefefe"));
+            bg_layout.setBackgroundResource(R.drawable.home_commentcenter_grey_bg_auto);
+            comment_weibolayout.setBackgroundResource(R.drawable.home_commentcenter_white_bg_auto);
             String mycommenttext = "@" + comment.reply_comment.user.name + ":" + comment.reply_comment.text;
             fillWeiBoContent(mycommenttext, context, mycomment);
         } else {
             mycomment.setVisibility(View.GONE);
             bg_layout.setBackgroundColor(Color.parseColor("#fefefe"));
-            comment_weibolayout.setBackgroundColor(Color.parseColor("#f7f7f7"));
+            comment_weibolayout.setBackgroundResource(R.drawable.home_commentcenter_grey_bg_auto);
         }
 
         //填充我所评论的微博的内容，包括微博的主人名，微博图片，微博文本内容

@@ -14,8 +14,8 @@ import android.widget.TextView;
 import com.wenming.weiswift.R;
 import com.wenming.weiswift.entity.Status;
 import com.wenming.weiswift.ui.common.FillContent;
-import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.activity.OriginPicTextCommentActivity;
-import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.activity.RetweetPicTextCommentActivity;
+import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.activity.OriginPicTextCommentDetailActivity;
+import com.wenming.weiswift.ui.login.fragment.home.weiboitemdetail.activity.RetweetPicTextCommentDetailActivity;
 import com.wenming.weiswift.widget.emojitextview.EmojiTextView;
 
 import java.util.ArrayList;
@@ -63,9 +63,19 @@ public abstract class MentionAdapter extends RecyclerView.Adapter<ViewHolder> {
             ((MentionViewHolder) holder).bg_layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext, RetweetPicTextCommentActivity.class);
+                    Intent intent = new Intent(mContext, RetweetPicTextCommentDetailActivity.class);
                     intent.putExtra("weiboitem", mDatas.get(position));
                     mContext.startActivity(intent);
+                }
+            });
+            ((MentionViewHolder) holder).mentionitem_layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mDatas.get(position).retweeted_status != null) {
+                        Intent intent = new Intent(mContext, OriginPicTextCommentDetailActivity.class);
+                        intent.putExtra("weiboitem", mDatas.get(position).retweeted_status);
+                        mContext.startActivity(intent);
+                    }
                 }
             });
         }
@@ -78,9 +88,19 @@ public abstract class MentionAdapter extends RecyclerView.Adapter<ViewHolder> {
             ((MentionViewHolder) holder).bg_layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext, OriginPicTextCommentActivity.class);
+                    Intent intent = new Intent(mContext, OriginPicTextCommentDetailActivity.class);
                     intent.putExtra("weiboitem", mDatas.get(position));
                     mContext.startActivity(intent);
+                }
+            });
+            ((MentionViewHolder) holder).mentionitem_layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mDatas.get(position).retweeted_status != null) {
+                        Intent intent = new Intent(mContext, OriginPicTextCommentDetailActivity.class);
+                        intent.putExtra("weiboitem", mDatas.get(position).retweeted_status);
+                        mContext.startActivity(intent);
+                    }
                 }
             });
         }
